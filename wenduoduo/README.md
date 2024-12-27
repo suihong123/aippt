@@ -153,7 +153,6 @@ css	string	⨯	注入 CSS 样式，可可通过传递自定义 CSS 来更加深�
 
 #事件类型
 iFrame 挂载完成
-
 {
   type: 'mounted',
 }
@@ -178,7 +177,6 @@ PPT 生成前触发 (用户点击“生成大纲”，以及选择完模版，�
   }
 }
 自定义模版完成触发
-
 {
   type: 'afterCreateCustomTemplate',
   data: {
@@ -190,7 +188,6 @@ PPT 生成前触发 (用户点击“生成大纲”，以及选择完模版，�
   }
 }
 PPT 生成完毕扣费时触发
-
 {
   type: 'charge',
   data: {
@@ -214,9 +211,7 @@ PPT 生成后触发
   }
 }
 该事件可以返回 true/false 或 string (也可以返回 异步 Promise<boolean | string>) 来决定用户是否能够继续下载 PPT，或指定 ppt 文档名称，返回的名称需要 以.pptx结尾才表示重命名文件 注意
-
 用户信息
-
 {
   type: 'user-info',
   data: {
@@ -226,7 +221,6 @@ PPT 生成后触发
   }
 }
 错误
-
 {
   type: 'error',
   data: {
@@ -234,17 +228,12 @@ PPT 生成后触发
     message:"您的次数已用完，请开通会员"
   }
 }
-其他 API
+#其他 API
 以下方法都是 DocmeeUI 类 实例的成员，需要通过docmeeUI.来调用
-
 docmeeUI.updateToken(newToken: string): void 更新用户 Token
-
 docmeeUI.destroy(): void 卸载 iframe
-
 docmeeUI.getInfo(): void 手动获取一次 用户信息，用户信息会在onMessage回调 中返回
-
 docmeeUI.navigate(obj: {page: 'creator' | 'dashboard' | 'editor' | 'customTemplate', pptId?: string}): void 跳转页面, 同样地如果前往 editor 页面，pptId 是必须的
-
 docmeeUI.navigate({ page: "dashboard" });
 docmeeUI.navigate({ page: "editor", pptId: "xxxx" });
 docmeeUI.sendMessage(message: {type: string, content: string}): void 控制 SDK 发送消息
@@ -260,20 +249,15 @@ docmeeUI.changeCreatorData(data: {subject: string, text: string}, createNow: boo
  *    如果为true，表示方法调用时直接开始生成，如果不传递或者传递false时，仅输入内容，需要用户点击生成大纲按钮
  */
 docmeeUI.changeCreatorData({ subject: "AI未来的发展" }, true);
-
 // 或
 docmeeUI.changeCreatorData({ text: "AI未来的发展" }, true);
 docmeeUI.updateTemplate(templateId: string) 外部指定更换模板，并刷新
-
 docmeeUI.showTemplateDialog(type?: 'custom' | 'system') 弹出模板选择弹框, type: 'custom' or 'system' (default)
-
 docmeeUI.getCurrentPptInfo() 返回 ppt 信息（在事件中返回，事件类型currentPptInfo）
 
 国际化
 为了应对多语种环境，文多多 AiPPT 支持国际化。
-
 目前支持的语言列表有:
-
 中文 zh
 英文 en
 日本语 jp
@@ -285,11 +269,8 @@ docmeeUI.getCurrentPptInfo() 返回 ppt 信息（在事件中返回，事件类�
 如果你想对某些接口进行特殊处理，比如图片接口走你们自己的图库接口之类的扩展，或者 API 代理商 提供给用户 iframe 接入方式，都可以通过 nginx 进行接口转发实现。
 
 示例：
-
 假设你的服务器域名为 xxx.com
-
 服务器端 nginx 配置如下：
-
 server {
     listen 8080;
     server_name xxx.com;
