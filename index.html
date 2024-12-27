@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AIPPT 生成器</title>
+    <!-- 引入文多多SDK -->
+    <script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #container {
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+        margin: 0;
+        padding: 0;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(120, 120, 120, 0.3);
+        overflow: hidden;
+        background: linear-gradient(-157deg, #f57bb0, #867dea);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+  </body>
+  <script>
+    // 初始化 UI iframe
+    const docmeeUI = new DocmeeUI({
+      token: 'ak_u_loy5FsT35FvozDKZ', // 需要替换成您的token
+      container: document.querySelector("#container"),
+      page: "creator", // 直接进入创建页面
+      lang: "zh",
+      mode: "light",
+      onMessage(message) {
+        console.log("收到消息", message);
+        
+        if (message.type === "invalid-token") {
+          console.log("token无效");
+        } else if (message.type === "beforeGenerate") {
+          const { subtype, fields } = message.data;
+          return true; // 允许生成
+        } else if (message.type === "error") {
+          console.error("发生错误：", message.data.message);
+        }
+      },
+    });
+  </script>
+</html>
