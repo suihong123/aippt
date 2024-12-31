@@ -104,28 +104,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const registerResponse = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
                     method: 'POST',
                     headers: {
-                        ...CONFIG.API_HEADERS,
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
                     },
-                    credentials: 'include',  // 包含 cookies
+                    mode: 'cors',
                     body: JSON.stringify({
                         phone: phone,
-                        password: password
+                        password: password,
+                        type: 'register'  // 添加请求类型
                     })
                 });
                 
-                if (!registerResponse.ok) {
-                    const errorText = await registerResponse.text();
-                    console.error('Registration failed:', registerResponse.status, errorText);
-                    throw new Error(`Registration failed: ${registerResponse.status}`);
-                }
+                // 先尝试获取响应文本
+                const responseText = await registerResponse.text();
+                console.log('Raw response:', responseText);
                 
                 let registerData;
                 try {
-                    registerData = await registerResponse.json();
+                    registerData = JSON.parse(responseText);
                 } catch (jsonError) {
-                    console.error('JSON parse error:', jsonError);
-                    throw new Error('Invalid response format');
+                    console.error('JSON parse error:', jsonError, 'Response text:', responseText);
+                    throw new Error('服务器响应格式错误');
                 }
                 
                 console.log('Register response:', registerData);
@@ -138,19 +138,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
                         },
+                        mode: 'cors',
                         body: JSON.stringify({
                             phone: phone,
-                            password: password
+                            password: password,
+                            type: 'login'  // 添加请求类型
                         })
                     });
                     
-                    if (!loginResponse.ok) {
-                        throw new Error(`HTTP error! status: ${loginResponse.status}`);
+                    const loginText = await loginResponse.text();
+                    console.log('Raw login response:', loginText);
+                    
+                    let loginData;
+                    try {
+                        loginData = JSON.parse(loginText);
+                    } catch (jsonError) {
+                        console.error('Login JSON parse error:', jsonError);
+                        throw new Error('登录响应格式错误');
                     }
                     
-                    const loginData = await loginResponse.json();
                     console.log('Auto-login response:', loginData);
                     
                     if (loginData.success) {
