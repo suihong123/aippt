@@ -17,4 +17,14 @@ const CONFIG = {
         SERVER_ERROR: '服务器错误，请稍后重试',
         default: '操作失败，请重试'
     }
+};
+
+// 添加调试模式
+CONFIG.DEBUG = true;
+
+// 添加日志函数
+CONFIG.log = function(message, data) {
+    if (CONFIG.DEBUG) {
+        console.log(`[AIPPT] ${message}`, data || '');
+    }
 }; 

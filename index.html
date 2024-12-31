@@ -125,42 +125,50 @@
     async function checkAuth() {
         try {
             const token = localStorage.getItem('userToken');
+            console.log('Checking auth with token:', token);
+            
             if (!token) {
-                window.location.href = 'login.html';
+                console.log('No token found, redirecting to login');
+                window.location.href = `${CONFIG.BASE_URL}/login.html`;
                 return;
             }
 
             // 验证token和使用权限
-            const response = await fetch('https://api.docmee.cn/api/user/status', {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/status`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            
+            console.log('Auth check response:', response);
             const data = await response.json();
+            console.log('Auth check data:', data);
             
             if (!data.success) {
-                window.location.href = 'login.html';
+                console.log('Auth check failed:', data.message);
+                window.location.href = `${CONFIG.BASE_URL}/login.html`;
                 return;
             }
             
             // 检查使用次数和到期时间
             if (data.data.remaining_uses <= 0) {
                 alert('使用次数已用完，请联系管理员购买新的激活码');
-                window.location.href = 'activate.html';
+                window.location.href = `${CONFIG.BASE_URL}/activate.html`;
                 return;
             }
             
             if (new Date(data.data.expire_time) < new Date()) {
                 alert('账号已过期，请联系管理员购买新的激活码');
-                window.location.href = 'activate.html';
+                window.location.href = `${CONFIG.BASE_URL}/activate.html`;
                 return;
             }
 
             // 使用用户的token初始化SDK
             CONFIG.TOKEN = token;
+            console.log('Auth check successful');
         } catch (err) {
-            console.error('验证失败:', err);
-            window.location.href = 'login.html';
+            console.error('Auth check error:', err);
+            window.location.href = `${CONFIG.BASE_URL}/login.html`;
         }
     }
 
