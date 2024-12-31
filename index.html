@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="AIPPT">
+    <meta name="robots" content="noindex,follow">
+    <meta property="og:title" content="AIPPT 生成器 - AI智能PPT生成工具">
+    <meta property="og:description" content="AI驱动的PPT生成工具，只需输入主题即可生成专业PPT">
+    <meta property="og:image" content="https://suihong123.github.io/aippt/icon.png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>AIPPT 生成器 - AI智能PPT生成工具</title>
+    <!-- 添加PWA支持 -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFJUFBU55Sf5oiQ5ZmoIiwKICAic2hvcnRfbmFtZSI6ICJBSVBQVCIsCiAgImRlc2NyaXB0aW9uIjogIkFJ6amx5Yqo55qEUFBU55Sf5oiQ5bel5YW3IiwKICAic3RhcnRfdXJsIjogIi9haXBwdC8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM4NjdkZWEiLAogICJ0aGVtZV9jb2xvciI6ICIjODY3ZGVhIiwKICAib3JpZW50YXRpb24iOiAiYW55IiwKICAic2NvcGUiOiAiL2FpcHB0LyIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImljb24ucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9LAogICAgewogICAgICAic3JjIjogImljb24tNTEyLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfSA=">
+    <meta name="theme-color" content="#867dea">
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- 预加载SDK -->
+    <link rel="preload" href="/aippt/static/docmee-ui-sdk-iframe.min-f22a8146.js" as="script">
+    <script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://docmee.cn; img-src 'self' https://docmee.cn data:; connect-src 'self' https://docmee.cn; frame-src 'self' https://docmee.cn; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- 添加Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered:', registration);
+            })
+            .catch(error => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      #container {
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+        margin: 0;
+        padding: 0;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(120, 120, 120, 0.3);
+        overflow: hidden;
+        background: linear-gradient(-157deg, #f57bb0, #867dea);
+        background-size: 200% 200%;
+        animation: gradient 15s ease infinite;
+        transition: all 0.3s ease;
+        opacity: 0;
+      }
+      #container.loaded {
+        opacity: 1;
+      }
+      @media (max-width: 768px) {
+        #container {
+          width: 100%;
+          height: 100%;
+          border-radius: 0;
+        }
+      }
+      .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+      }
+    </style>
+    <!-- 添加资源提示 -->
+    <link rel="dns-prefetch" href="https://docmee.cn">
+    <link rel="preconnect" href="https://docmee.cn">
+    
+    <script async type="module" crossorigin src="/aippt/static/main-87ef4f3e.js"></script>
+    <link rel="stylesheet" href="/aippt/static/index-dcbe34f5.css">
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="static/js/main.js"></script>
+    <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+    <script nomodule crossorigin id="vite-legacy-entry" data-src="/aippt/static/main-legacy-b9cda9a4.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+  </body>
+  <script>
+    // 使用常量管理配置
+    const CONFIG = {
+      TOKEN: 'ak_u_loy5FsT35FvozDKZ',
+      LANG: 'zh',
+      MODE: 'light',
+      ERROR_MESSAGES: {
+        88: "使用次数已用完，请稍后再试",
+        default: "操作失败，请刷新页面重试"
+      }
+    };
+
+    // 定义回调处理函数
+    const handleCallback = {
+      onError: (error) => {
+        console.error('发生错误:', error);
+        // 添加错误上报
+        if (typeof error === 'object') {
+          const { message, stack } = error;
+          console.log('错误详情:', { message, stack });
+        }
+      },
+      onSuccess: (data) => {
+        console.log('操作成功:', data);
+        // 添加成功率统计
+        if (data.type === 'afterGenerate') {
+          console.log('生成成功:', data);
+        }
+      }
+    };
+
+    // 检查登录状态
+    async function checkAuth() {
+        try {
+            const token = localStorage.getItem('userToken');
+            console.log('Checking auth with token:', token);
+            
+            if (!token) {
+                console.log('No token found, redirecting to login');
+                window.location.href = `${CONFIG.BASE_URL}/login.html`;
+                return;
+            }
+
+            // 验证token和使用权限
+            const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/status`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            console.log('Auth check response:', response);
+            const data = await response.json();
+            console.log('Auth check data:', data);
+            
+            if (!data.success) {
+                console.log('Auth check failed:', data.message);
+                window.location.href = `${CONFIG.BASE_URL}/login.html`;
+                return;
+            }
+            
+            // 检查使用次数和到期时间
+            if (data.data.remaining_uses <= 0) {
+                alert('使用次数已用完，请联系管理员购买新的激活码');
+                window.location.href = `${CONFIG.BASE_URL}/activate.html`;
+                return;
+            }
+            
+            if (new Date(data.data.expire_time) < new Date()) {
+                alert('账号已过期，请联系管理员购买新的激活码');
+                window.location.href = `${CONFIG.BASE_URL}/activate.html`;
+                return;
+            }
+
+            // 使用用户的token初始化SDK
+            CONFIG.TOKEN = token;
+            console.log('Auth check successful');
+        } catch (err) {
+            console.error('Auth check error:', err);
+            window.location.href = `${CONFIG.BASE_URL}/login.html`;
+        }
+    }
+
+    // 页面加载时检查认证
+    checkAuth();
+
+    // 初始化 UI iframe
+    const docmeeUI = new DocmeeUI({
+      token: CONFIG.TOKEN,
+      container: document.querySelector("#container"),
+      page: "creator",
+      lang: CONFIG.LANG,
+      mode: CONFIG.MODE,
+      onMessage(message) {
+        try {
+          if (message.type === "invalid-token") {
+            handleCallback.onError("Token验证失败，请检查配置");
+          } else if (message.type === "error") {
+            const errorMap = {
+              88: "使用次数已用完，请稍后再试",
+              default: "操作失败，请刷新页面重试"
+            };
+            handleCallback.onError(errorMap[message.data.code] || errorMap.default);
+          } else {
+            handleCallback.onSuccess(message);
+          }
+        } catch (err) {
+          handleCallback.onError(err);
+        }
+      },
+    });
+  </script>
+</html>
