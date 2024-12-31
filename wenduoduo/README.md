@@ -1,52 +1,35 @@
-# AIPPT 生成器
+# Wenduoduo SDK
 
-基于AI的智能PPT生成工具，只需输入主题即可快速生成专业PPT。
+文多多SDK集成说明
 
-## 功能特点
+## 使用方法
 
-- 一键生成PPT
-- 智能排版
-- 专业模板
-- 在线预览
-- 用户系统
-- 安全认证
-
-## 快速开始
-
-1. 克隆仓库
-```bash
-git clone https://github.com/suihong123/aippt.git
-cd aippt
+1. 引入SDK
+```html
+<script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
 ```
 
-2. 安装依赖
-```bash
-pip install -r requirements.txt
+2. 初始化
+```javascript
+const docmeeUI = new DocmeeUI({
+    token: 'your-token',
+    container: document.querySelector("#container"),
+    page: "creator",
+    lang: "zh",
+    mode: "light"
+});
 ```
 
-3. 配置
-- 复制 config.py.example 为 config.py
-- 修改配置项
+## 配置说明
 
-4. 运行
-```bash
-python app.py
-```
+- token: API访问令牌
+- container: 容器元素
+- page: 页面类型（creator/viewer）
+- lang: 语言（zh/en）
+- mode: 主题模式（light/dark）
 
-## 目录结构
+## 注意事项
 
-```
-aippt/
-├── static/          # 静态资源
-├── templates/       # 模板文件
-├── wenduoduo/      # SDK目录
-└── config.py       # 配置文件
-```
-
-## 技术栈
-
-- Python
-- Flask
-- MySQL
-- JavaScript
-- HTML/CSS
+1. 确保容器元素具有合适的尺寸
+2. 处理好错误回调
+3. 注意跨域问题
