@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIPPT生成器 - 性能监控</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .monitor-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-title {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .chart-container {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="monitor-container">
+        <h1>系统监控</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">CPU使用率</div>
+                <div class="stat-value" id="cpuUsage">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">内存使用率</div>
+                <div class="stat-value" id="memoryUsage">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">磁盘使用率</div>
+                <div class="stat-value" id="diskUsage">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">请求/分钟</div>
+                <div class="stat-value" id="requestRate">-</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="responseTimeChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="memoryChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
+        const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+        
+        const responseTimeChart = new Chart(responseTimeCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '响应时间 (ms)',
+                    data: [],
+                    borderColor: '#867dea',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const memoryChart = new Chart(memoryCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '内存使用 (MB)',
+                    data: [],
+                    borderColor: '#f57bb0',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // 更新系统状态
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/monitor/stats');
+                const data = await response.json();
+                
+                document.getElementById('cpuUsage').textContent = `${data.cpu_percent}%`;
+                document.getElementById('memoryUsage').textContent = `${data.memory_percent}%`;
+                document.getElementById('diskUsage').textContent = `${data.disk_usage}%`;
+                document.getElementById('requestRate').textContent = data.request_rate;
+
+                // 更新图表
+                const now = new Date().toLocaleTimeString();
+                
+                responseTimeChart.data.labels.push(now);
+                responseTimeChart.data.datasets[0].data.push(data.avg_response_time);
+                if (responseTimeChart.data.labels.length > 20) {
+                    responseTimeChart.data.labels.shift();
+                    responseTimeChart.data.datasets[0].data.shift();
+                }
+                responseTimeChart.update();
+
+                memoryChart.data.labels.push(now);
+                memoryChart.data.datasets[0].data.push(data.memory_used);
+                if (memoryChart.data.labels.length > 20) {
+                    memoryChart.data.labels.shift();
+                    memoryChart.data.datasets[0].data.shift();
+                }
+                memoryChart.update();
+            } catch (err) {
+                console.error('获取系统状态失败:', err);
+            }
+        }
+
+        // 每5秒更新一次
+        setInterval(updateStats, 5000);
+        updateStats();
+    </script>
+</body>
+</html> 

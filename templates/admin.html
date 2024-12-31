@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="AIPPT">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="description" content="AIPPT生成器管理后台">
+    <meta property="og:title" content="AIPPT 生成器 - AI智能PPT生成工具">
+    <meta property="og:description" content="AI驱动的PPT生成工具，只需输入主题即可生成专业PPT">
+    <meta property="og:image" content="https://suihong123.github.io/aippt/icon.png">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <title>AIPPT 生成器 - 管理后台</title>
+    <!-- 预加载SDK -->
+    <link rel="preload" href="./wenduoduo/docmee-ui-sdk-iframe.min.js" as="script">
+    <script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://docmee.cn; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      #container {
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+        margin: 0;
+        padding: 0;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(120, 120, 120, 0.3);
+        overflow: hidden;
+        background: linear-gradient(-157deg, #f57bb0, #867dea);
+        background-size: 200% 200%;
+        animation: gradient 15s ease infinite;
+      }
+      @media (max-width: 768px) {
+        #container {
+          width: 100%;
+          height: 100%;
+          border-radius: 0;
+        }
+      }
+      .admin-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .admin-logout {
+        color: #f57bb0;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        border: 1px solid currentColor;
+      }
+      /* 管理面板样式 */
+      .admin-container {
+        padding: 5rem 2rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .code-generator {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .form-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+      .form-group {
+        flex: 1;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .generate-btn {
+        background: #867dea;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .codes-list {
+        margin-top: 2rem;
+      }
+      .codes-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .codes-table th,
+      .codes-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+    </style>
+    <link rel="stylesheet" href="/static/css/main.css">
+  </head>
+  <body>
+    <header class="admin-header">
+      <h1>管理后台</h1>
+      <a href="/logout" class="admin-logout">退出登录</a>
+    </header>
+    <div class="admin-container">
+      <div class="code-generator">
+        <h2>生成激活码</h2>
+        <form id="generateForm" onsubmit="generateCode(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="days">有效天数</label>
+              <input type="number" id="days" name="days" value="30" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="uses">使用次数</label>
+              <input type="number" id="uses" name="uses" value="100" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="count">生成数量</label>
+              <input type="number" id="count" name="count" value="1" min="1" max="50" required>
+            </div>
+          </div>
+          <button type="submit" class="generate-btn">生成激活码</button>
+        </form>
+      </div>
+      
+      <div class="codes-list">
+        <h2>激活码列表</h2>
+        <table class="codes-table">
+          <thead>
+            <tr>
+              <th>激活码</th>
+              <th>有效天数</th>
+              <th>使用次数</th>
+              <th>状态</th>
+              <th>生成时间</th>
+              <th>使用时间</th>
+            </tr>
+          </thead>
+          <tbody id="codesList"></tbody>
+        </table>
+      </div>
+
+      <div class="user-management">
+        <h2>用户管理</h2>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>用户名</th>
+              <th>邮箱</th>
+              <th>注册时间</th>
+              <th>最后登录</th>
+              <th>剩余次数</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="userList"></tbody>
+        </table>
+      </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+      // 生成激活码
+      async function generateCode(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = {
+          days: parseInt(formData.get('days')),
+          uses: parseInt(formData.get('uses')),
+          count: parseInt(formData.get('count'))
+        };
+        
+        try {
+          const response = await fetch('/api/admin/generate-code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+          const result = await response.json();
+          
+          if (result.success) {
+            alert('激活码生成成功！');
+            loadCodesList();
+          } else {
+            alert(result.message || '生成失败');
+          }
+        } catch (err) {
+          alert('生成失败，请重试');
+        }
+      }
+
+      // 加载激活码列表
+      async function loadCodesList() {
+        try {
+          const response = await fetch('/api/admin/codes-list');
+          const data = await response.json();
+          
+          if (data.success) {
+            const tbody = document.getElementById('codesList');
+            tbody.innerHTML = data.data.map(code => `
+              <tr>
+                <td>${code.code}</td>
+                <td>${code.days}天</td>
+                <td>${code.uses}次</td>
+                <td>${code.used === '1' ? '已使用' : '未使用'}</td>
+                <td>${new Date(code.create_time * 1000).toLocaleString()}</td>
+                <td>${code.used_time ? new Date(code.used_time * 1000).toLocaleString() : '-'}</td>
+              </tr>
+            `).join('');
+          }
+        } catch (err) {
+          console.error('加载失败:', err);
+        }
+      }
+
+      // 页面加载时获取激活码列表
+      loadCodesList();
+    </script>
+  </body>
+</html>

@@ -4,18 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="AIPPT">
-    <meta name="robots" content="index,follow">
+    <meta name="robots" content="noindex,follow">
     <meta property="og:title" content="AIPPT 生成器 - AI智能PPT生成工具">
     <meta property="og:description" content="AI驱动的PPT生成工具，只需输入主题即可生成专业PPT">
     <meta property="og:image" content="https://suihong123.github.io/aippt/icon.png">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>AIPPT 生成器 - AI智能PPT生成工具</title>
+    <!-- 添加PWA支持 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#867dea">
+    <link rel="apple-touch-icon" href="icon.png">
     <!-- 预加载SDK -->
     <link rel="preload" href="./wenduoduo/docmee-ui-sdk-iframe.min.js" as="script">
     <script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://docmee.cn; img-src 'self' https://docmee.cn data:; connect-src 'self' https://docmee.cn; frame-src 'self' https://docmee.cn; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
+    <!-- 添加Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered:', registration);
+            })
+            .catch(error => {
+              console.log('SW registration failed:', error);
+            });
+        });
+      }
+    </script>
     <style>
       body {
         width: 100vw;
@@ -66,12 +84,11 @@
     <!-- 添加资源提示 -->
     <link rel="dns-prefetch" href="https://docmee.cn">
     <link rel="preconnect" href="https://docmee.cn">
-    <!-- 添加PWA支持 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#867dea">
+    <link rel="stylesheet" href="/static/css/main.css">
   </head>
   <body>
     <div id="container"></div>
+    <script src="/static/js/main.js"></script>
   </body>
   <script>
     // 使用常量管理配置
@@ -103,6 +120,35 @@
         }
       }
     };
+
+    // 检查登录状态
+    async function checkAuth() {
+        try {
+            const response = await fetch('/api/user/status');
+            const data = await response.json();
+            if (!data.success) {
+                window.location.href = '/login';
+                return;
+            }
+            
+            // 检查使用次数和到期时间
+            if (data.data.remaining_uses <= 0) {
+                alert('使用次数已用完，请激活新的激活码');
+                return;
+            }
+            
+            if (new Date(data.data.expire_time) < new Date()) {
+                alert('账号已过期，请激活新的激活码');
+                return;
+            }
+        } catch (err) {
+            console.error('验证失败:', err);
+            window.location.href = '/login';
+        }
+    }
+
+    // 页面加载时检查认证
+    checkAuth();
 
     // 初始化 UI iframe
     const docmeeUI = new DocmeeUI({

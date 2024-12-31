@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="使用AI技术快速生成专业PPT">
+    <title>AIPPT生成器 - 主页</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        /* 用户信息面板 */
+        .user-panel {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 100;
+            min-width: 200px;
+        }
+        .user-info {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 0.875rem;
+        }
+        .user-info .label {
+            color: #666;
+            margin-right: 0.5rem;
+        }
+        .activate-form {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        .activate-form input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .activate-btn {
+            background: #867dea;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .activate-btn:hover {
+            background: #7367d5;
+        }
+        .user-actions a {
+            color: #867dea;
+            text-decoration: none;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-panel">
+        <div class="user-info">
+            <div><span class="label">用户名：</span><span id="username">-</span></div>
+            <div><span class="label">剩余次数：</span><span id="remaining-uses">-</span></div>
+            <div><span class="label">到期时间：</span><span id="expire-time">-</span></div>
+        </div>
+        <div class="activate-form">
+            <input type="text" id="activate-code" placeholder="输入激活码">
+            <button class="activate-btn" onclick="activateCode()">激活</button>
+        </div>
+        <div class="user-actions">
+            <a href="/profile">个人信息</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </div>
+    <div id="container"></div>
+    <script src="/static/js/main.js"></script>
+    <script>
+        // 获取用户信息
+        async function getUserInfo() {
+            try {
+                const response = await fetch('/api/user/status');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('username').textContent = data.data.username;
+                    document.getElementById('remaining-uses').textContent = data.data.remaining_uses;
+                    document.getElementById('expire-time').textContent = data.data.expire_time || '未激活';
+                }
+            } catch (err) {
+                console.error('获取用户信息失败');
+            }
+        }
+
+        // 激活码处理
+        async function activateCode() {
+            const code = document.getElementById('activate-code').value;
+            if (!code) {
+                alert('请输入激活码');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/activate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('激活成功！');
+                    getUserInfo();  // 刷新用户信息
+                    document.getElementById('activate-code').value = '';
+                } else {
+                    alert(data.message || '激活失败');
+                }
+            } catch (err) {
+                alert('激活失败，请重试');
+            }
+        }
+
+        getUserInfo();
+    </script>
+</body>
+</html>

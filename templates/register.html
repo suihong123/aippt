@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <title>AIPPT生成器 - 注册</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <style>
+        .password-strength {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .password-strength.weak { color: #ff4d4f; }
+        .password-strength.medium { color: #faad14; }
+        .password-strength.strong { color: #52c41a; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 style="text-align: center; margin-bottom: 2rem;">注册 AIPPT</h2>
+        <form id="registerForm" method="post">
+            <div id="errorMessage" class="error-message"></div>
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required>
+                <div id="passwordStrength" class="password-strength"></div>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">确认密码</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <div class="form-group captcha-group">
+                <label for="captcha">验证码</label>
+                <div class="captcha-container">
+                    <input type="text" id="captcha" name="captcha" required maxlength="4">
+                    <img id="captchaImage" src="/api/captcha" alt="验证码" 
+                         onclick="this.src='/api/captcha?t='+new Date().getTime()">
+                </div>
+            </div>
+            <button type="submit" class="btn">注册</button>
+        </form>
+        <div class="links">
+            <a href="/login">已有账号？立即登录</a>
+        </div>
+    </div>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        // 密码强度检查
+        function checkPasswordStrength(password) {
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*]/.test(password);
+            const isLongEnough = password.length >= 8;
+            
+            if (isLongEnough && hasLetter && hasNumber && hasSpecial) {
+                return { level: 'strong', message: '密码强度：强' };
+            } else if (isLongEnough && ((hasLetter && hasNumber) || (hasLetter && hasSpecial) || (hasNumber && hasSpecial))) {
+                return { level: 'medium', message: '密码强度：中' };
+            }
+            return { level: 'weak', message: '密码强度：弱' };
+        }
+
+        // 监听密码输入
+        document.getElementById('password').addEventListener('input', (e) => {
+            const strength = checkPasswordStrength(e.target.value);
+            const strengthEl = document.getElementById('passwordStrength');
+            strengthEl.textContent = strength.message;
+            strengthEl.className = `password-strength ${strength.level}`;
+        });
+
+        // 表单提交
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // 表单验证
+            const validation = validateForm(formData);
+            if (!validation.valid) {
+                errorMessage.textContent = validation.message;
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            errorMessage.style.display = 'none';
+            
+            const result = await handleAuth(formData, '/api/register');
+            
+            if (result.success) {
+                alert('注册成功！');
+                window.location.href = '/login';
+            } else {
+                errorMessage.textContent = result.message || '注册失败';
+                errorMessage.style.display = 'block';
+            }
+            
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        });
+    </script>
+</body>
+</html> 
