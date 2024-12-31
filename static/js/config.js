@@ -1,5 +1,5 @@
 // 全局配置
-const CONFIG = {
+window.CONFIG = {
     API_BASE_URL: 'https://api.docmee.cn',
     BASE_URL: '/aippt',
     ASSETS_URL: './static',
@@ -39,7 +39,4 @@ CONFIG.log = function(message, data) {
     if (CONFIG.DEBUG) {
         console.log(`[AIPPT] ${message}`, data || '');
     }
-};
-
-// 导出配置
-export default CONFIG; 
+}; 
