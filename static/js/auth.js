@@ -101,96 +101,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Attempting registration...', { phone });
                 
                 // 注册请求
-                const registerResponse = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
+                        'Content-Type': 'application/json'
                     },
-                    mode: 'cors',
                     body: JSON.stringify({
                         phone: phone,
-                        password: password,
-                        type: 'register'  // 添加请求类型
+                        password: password
                     })
                 });
-                
-                // 先尝试获取响应文本
-                const responseText = await registerResponse.text();
-                console.log('Raw response:', responseText);
-                
-                let registerData;
-                try {
-                    registerData = JSON.parse(responseText);
-                } catch (jsonError) {
-                    console.error('JSON parse error:', jsonError, 'Response text:', responseText);
-                    throw new Error('服务器响应格式错误');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                console.log('Register response:', registerData);
+                const data = await response.json();
+                console.log('Register response:', data);
                 
-                if (registerData.success) {
-                    // 注册成功后立即登录
-                    console.log('Registration successful, attempting auto-login...');
-                    
-                    const loginResponse = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
-                        },
-                        mode: 'cors',
-                        body: JSON.stringify({
-                            phone: phone,
-                            password: password,
-                            type: 'login'  // 添加请求类型
-                        })
-                    });
-                    
-                    const loginText = await loginResponse.text();
-                    console.log('Raw login response:', loginText);
-                    
-                    let loginData;
-                    try {
-                        loginData = JSON.parse(loginText);
-                    } catch (jsonError) {
-                        console.error('Login JSON parse error:', jsonError);
-                        throw new Error('登录响应格式错误');
-                    }
-                    
-                    console.log('Auto-login response:', loginData);
-                    
-                    if (loginData.success) {
-                        // 保存登录信息
-                        localStorage.setItem('userToken', loginData.token);
-                        localStorage.setItem('userPhone', phone);
-                        console.log('Auto-login successful, redirecting...');
-                        
-                        // 跳转到主页
-                        window.location.href = `${CONFIG.BASE_URL}/index.html`;
-                    } else {
-                        console.error('Auto-login failed:', loginData.message);
-                        const errorMessage = document.getElementById('errorMessage');
-                        errorMessage.textContent = '注册成功但自动登录失败，请手动登录';
-                        errorMessage.style.display = 'block';
-                        
-                        // 延迟2秒后跳转到登录页
-                        setTimeout(() => {
-                            window.location.href = `${CONFIG.BASE_URL}/login.html`;
-                        }, 2000);
-                    }
+                if (data.success) {
+                    // 注册成功
+                    alert('注册成功！');
+                    window.location.href = `${CONFIG.BASE_URL}/login.html`;
                 } else {
-                    console.error('Registration failed:', registerData.message);
                     const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = registerData.message || '注册失败，请重试';
+                    errorMessage.textContent = data.message || CONFIG.ERROR_MESSAGES.REGISTER_FAILED;
                     errorMessage.style.display = 'block';
                 }
             } catch (err) {
                 console.error('Registration error:', err);
                 const errorMessage = document.getElementById('errorMessage');
-                errorMessage.textContent = err.message || '注册失败，请检查网络连接';
+                errorMessage.textContent = CONFIG.ERROR_MESSAGES.NETWORK_ERROR;
                 errorMessage.style.display = 'block';
             }
         });
