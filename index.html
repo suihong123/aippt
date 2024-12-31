@@ -11,7 +11,7 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <title>AIPPT 生成器 - AI智能PPT生成工具</title>
     <!-- 添加PWA支持 -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFJUFBU55Sf5oiQ5ZmoIiwKICAic2hvcnRfbmFtZSI6ICJBSVBQVCIsCiAgImRlc2NyaXB0aW9uIjogIkFJ6amx5Yqo55qEUFBU55Sf5oiQ5bel5YW3IiwKICAic3RhcnRfdXJsIjogIi9haXBwdC8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLAogICJ0aGVtZV9jb2xvciI6ICIjODY3ZGVhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaWNvbi5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0g">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFJUFBU55Sf5oiQ5ZmoIiwKICAic2hvcnRfbmFtZSI6ICJBSVBQVCIsCiAgImRlc2NyaXB0aW9uIjogIkFJ6amx5Yqo55qEUFBU55Sf5oiQ5bel5YW3IiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAic2NvcGUiOiAiL2FpcHB0LyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM4NjdkZWEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICIuL2ljb24ucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9IA==">
     <meta name="theme-color" content="#867dea">
     <link rel="apple-touch-icon" href="icon.png">
     <!-- 预加载SDK -->
@@ -24,7 +24,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('./sw.js')
             .then(registration => {
               console.log('SW registered:', registration);
             })
@@ -90,14 +90,18 @@
   </head>
   <body>
     <div id="container"></div>
-    <script src="static/js/main.js"></script>
+    <script src="./static/js/config.js"></script>
+    <script src="./static/js/utils.js"></script>
+    <script src="./static/js/main.js"></script>
     <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
     <script nomodule crossorigin id="vite-legacy-entry" data-src="/aippt/static/main-legacy-b9cda9a4.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
   </body>
   <script>
     // 使用常量管理配置
     const CONFIG = {
-      TOKEN: 'ak_u_loy5FsT35FvozDKZ',
+      API_BASE_URL: 'https://api.docmee.cn',
+      BASE_URL: '/aippt',
+      TOKEN: localStorage.getItem('userToken') || 'ak_u_loy5FsT35FvozDKZ',
       LANG: 'zh',
       MODE: 'light',
       ERROR_MESSAGES: {
@@ -125,84 +129,36 @@
       }
     };
 
-    // 检查登录状态
-    async function checkAuth() {
-        try {
-            const token = localStorage.getItem('userToken');
-            console.log('Checking auth with token:', token);
-            
-            if (!token) {
-                console.log('No token found, redirecting to login');
-                window.location.href = `${CONFIG.BASE_URL}/login.html`;
-                return;
-            }
-
-            // 验证token和使用权限
-            const response = await fetch(`${CONFIG.API_BASE_URL}/api/user/status`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            console.log('Auth check response:', response);
-            const data = await response.json();
-            console.log('Auth check data:', data);
-            
-            if (!data.success) {
-                console.log('Auth check failed:', data.message);
-                window.location.href = `${CONFIG.BASE_URL}/login.html`;
-                return;
-            }
-            
-            // 检查使用次数和到期时间
-            if (data.data.remaining_uses <= 0) {
-                alert('使用次数已用完，请联系管理员购买新的激活码');
-                window.location.href = `${CONFIG.BASE_URL}/activate.html`;
-                return;
-            }
-            
-            if (new Date(data.data.expire_time) < new Date()) {
-                alert('账号已过期，请联系管理员购买新的激活码');
-                window.location.href = `${CONFIG.BASE_URL}/activate.html`;
-                return;
-            }
-
-            // 使用用户的token初始化SDK
-            CONFIG.TOKEN = token;
-            console.log('Auth check successful');
-        } catch (err) {
-            console.error('Auth check error:', err);
-            window.location.href = `${CONFIG.BASE_URL}/login.html`;
-        }
-    }
-
-    // 页面加载时检查认证
-    checkAuth();
-
     // 初始化 UI iframe
-    const docmeeUI = new DocmeeUI({
-      token: CONFIG.TOKEN,
-      container: document.querySelector("#container"),
-      page: "creator",
-      lang: CONFIG.LANG,
-      mode: CONFIG.MODE,
-      onMessage(message) {
-        try {
-          if (message.type === "invalid-token") {
-            handleCallback.onError("Token验证失败，请检查配置");
-          } else if (message.type === "error") {
-            const errorMap = {
-              88: "使用次数已用完，请稍后再试",
-              default: "操作失败，请刷新页面重试"
-            };
-            handleCallback.onError(errorMap[message.data.code] || errorMap.default);
-          } else {
-            handleCallback.onSuccess(message);
+    window.addEventListener('load', () => {
+      const docmeeUI = new DocmeeUI({
+        token: CONFIG.TOKEN,
+        container: document.querySelector("#container"),
+        page: "creator",
+        lang: CONFIG.LANG,
+        mode: CONFIG.MODE,
+        onMessage(message) {
+          try {
+            if (message.type === "invalid-token") {
+              handleCallback.onError("Token验证失败，请检查配置");
+              window.location.href = `${CONFIG.BASE_URL}/login.html`;
+            } else if (message.type === "error") {
+              const errorMap = {
+                88: "使用次数已用完，请稍后再试",
+                default: "操作失败，请刷新页面重试"
+              };
+              handleCallback.onError(errorMap[message.data.code] || errorMap.default);
+            } else {
+              handleCallback.onSuccess(message);
+            }
+          } catch (err) {
+            handleCallback.onError(err);
           }
-        } catch (err) {
-          handleCallback.onError(err);
-        }
-      },
+        },
+      });
+      
+      // 显示容器
+      document.querySelector("#container").classList.add('loaded');
     });
   </script>
 </html>
