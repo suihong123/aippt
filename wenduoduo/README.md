@@ -6,7 +6,7 @@
 
 1. 引入SDK
 ```html
-<script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
+<script src="https://docmee.cn/sdk/docmee-ui-sdk-iframe.min.js"></script>
 ```
 
 2. 初始化
