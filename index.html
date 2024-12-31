@@ -80,6 +80,28 @@
         transform: translate(-50%, -50%);
         display: none;
       }
+      .login-tip {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .login-tip button {
+        background: #867dea;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      .login-tip button:hover {
+        background: #7367d5;
+      }
     </style>
     <!-- 添加资源提示 -->
     <link rel="dns-prefetch" href="https://docmee.cn">
@@ -95,13 +117,10 @@
         // 等待配置加载完成
         window.addEventListener('load', async () => {
             try {
-                // 检查登录状态
-                const token = localStorage.getItem('userToken');
-                if (!token) {
-                    window.location.href = '/aippt/login.html';
-                    return;
-                }
-
+                // 获取token
+                const token = CONFIG.SDK.DEFAULT_TOKEN;
+                const isLoggedIn = localStorage.getItem('userToken');
+                
                 // 初始化 UI iframe
                 const docmeeUI = new DocmeeUI({
                     token: token,
@@ -113,11 +132,23 @@
                         try {
                             if (message.type === "invalid-token") {
                                 console.error("Token验证失败");
-                                localStorage.removeItem('userToken');
-                                window.location.href = '/aippt/login.html';
+                                docmeeUI.updateToken(CONFIG.SDK.DEFAULT_TOKEN);
                             } else if (message.type === "error") {
-                                console.error("SDK错误:", message);
-                                alert(message.data.message || "操作失败，请重试");
+                                if (!isLoggedIn) {
+                                    if (confirm('请登录后使用完整功能，是否现在登录？')) {
+                                        window.location.href = '/aippt/login.html';
+                                    }
+                                } else {
+                                    console.error("SDK错误:", message);
+                                    alert(message.data.message || "操作失败，请重试");
+                                }
+                            } else if (message.type === "click" || message.type === "input") {
+                                if (!isLoggedIn) {
+                                    if (confirm('请登录后使用完整功能，是否现在登录？')) {
+                                        window.location.href = '/aippt/login.html';
+                                    }
+                                    return;
+                                }
                             }
                         } catch (err) {
                             console.error("消息处理错误:", err);
@@ -127,6 +158,18 @@
 
                 // 显示容器
                 document.querySelector("#container").classList.add('loaded');
+                
+                if (!isLoggedIn) {
+                    const loginTip = document.createElement('div');
+                    loginTip.className = 'login-tip';
+                    loginTip.innerHTML = `
+                        <div class="tip-content">
+                            <p>请登录后使用完整功能</p>
+                            <button onclick="window.location.href='/aippt/login.html'">立即登录</button>
+                        </div>
+                    `;
+                    document.body.appendChild(loginTip);
+                }
             } catch (err) {
                 console.error("初始化错误:", err);
                 alert("系统初始化失败，请刷新页面重试");
