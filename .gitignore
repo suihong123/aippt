@@ -1,27 +1,20 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-venv/
-.env
-
-# Node
+# Dependencies
 node_modules/
+.npm
+
+# Build
 dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/
 .idea/
 
-# Logs
-logs/
-*.log
-
-# 上传文件
-uploads/
-
-# 备份文件
-backups/
-
-# 其他
-.DS_Store 
+# System
+.DS_Store
+Thumbs.db 

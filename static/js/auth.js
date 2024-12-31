@@ -68,7 +68,16 @@ if (document.getElementById('registerForm')) {
         e.preventDefault();
         const formData = new FormData(e.target);
         
+        // 验证密码
+        if (formData.get('password') !== formData.get('confirm_password')) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '两次输入的密码不一致';
+            errorMessage.style.display = 'block';
+            return;
+        }
+        
         try {
+            // 注册请求
             const registerResponse = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
                 method: 'POST',
                 headers: {
@@ -81,8 +90,10 @@ if (document.getElementById('registerForm')) {
             });
             
             const registerData = await registerResponse.json();
+            console.log('Register response:', registerData); // 调试日志
+            
             if (registerData.success) {
-                // 注册成功后直接登录
+                // 注册成功后自动登录
                 const loginResponse = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
                     method: 'POST',
                     headers: {
@@ -95,20 +106,29 @@ if (document.getElementById('registerForm')) {
                 });
                 
                 const loginData = await loginResponse.json();
+                console.log('Auto login response:', loginData); // 调试日志
+                
                 if (loginData.success) {
                     localStorage.setItem('userToken', loginData.token);
-                    // 使用 CONFIG.BASE_URL 构建完整路径
                     window.location.href = `${CONFIG.BASE_URL}/index.html`;
                 } else {
-                    alert('登录失败：' + (loginData.message || '请手动登录'));
-                    window.location.href = `${CONFIG.BASE_URL}/login.html`;
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = '自动登录失败：' + (loginData.message || '请手动登录');
+                    errorMessage.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = `${CONFIG.BASE_URL}/login.html`;
+                    }, 2000);
                 }
             } else {
-                alert(registerData.message || '注册失败，请重试');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = registerData.message || '注册失败，请重试';
+                errorMessage.style.display = 'block';
             }
         } catch (err) {
             console.error('注册失败:', err);
-            alert('注册失败，请重试');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '注册失败，请检查网络连接';
+            errorMessage.style.display = 'block';
         }
     });
 } 
