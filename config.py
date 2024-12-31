@@ -2,8 +2,8 @@
 APP_CONFIG = {
     'DEBUG': False,
     'SECRET_KEY': 'your-secret-key',
-    'SESSION_TYPE': 'redis',
-    'PERMANENT_SESSION_LIFETIME': timedelta(days=7)
+    'BASE_URL': '/aippt/',  # GitHub Pages 项目路径
+    'SESSION_TYPE': 'redis'
 }
 
 # Redis配置
@@ -25,12 +25,11 @@ SECURITY_CONFIG = {
 
 # API配置
 API_CONFIG = {
-    'RATE_LIMIT': {
-        'DEFAULT': '100/hour',
-        'LOGIN': '5/minute',
-        'REGISTER': '3/hour'
-    },
-    'MAX_CONTENT_LENGTH': 10 * 1024 * 1024  # 10MB
+    'base_url': 'https://api.docmee.cn',  # 使用外部API
+    'endpoints': {
+        'login': '/api/login',
+        'register': '/api/register'
+    }
 }
 
 # 邮件配置

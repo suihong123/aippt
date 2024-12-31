@@ -2,7 +2,7 @@
   "name": "AIPPT生成器",
   "short_name": "AIPPT",
   "description": "AI驱动的PPT生成工具",
-  "start_url": "/login",
+  "start_url": "/aippt/",
   "display": "standalone",
   "background_color": "#867dea",
   "theme_color": "#867dea",
