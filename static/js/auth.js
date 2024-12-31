@@ -26,58 +26,55 @@ function validateForm(formData) {
 }
 
 // 处理登录
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    
-    try {
-        // 添加详细的调试日志
-        console.log('Login attempt:', {
-            phone: formData.get('phone'),
-            url: `${CONFIG.API_BASE_URL}/api/login`
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                console.log('Login attempt:', {
+                    phone: formData.get('phone'),
+                    url: `${CONFIG.API_BASE_URL}/api/login`
+                });
 
-        const response = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                phone: formData.get('phone'),
-                password: formData.get('password')
-            })
-        });
-        
-        // 记录原始响应
-        console.log('Raw response:', response);
-        
-        const data = await response.json();
-        console.log('Login response data:', data);
-        
-        if (data.success) {
-            // 检查 token 是否存在
-            if (!data.token) {
-                throw new Error('No token received');
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: formData.get('phone'),
+                        password: formData.get('password')
+                    })
+                });
+                
+                console.log('Raw response:', response);
+                const data = await response.json();
+                console.log('Login response data:', data);
+                
+                if (data.success) {
+                    if (!data.token) {
+                        throw new Error('No token received');
+                    }
+                    
+                    localStorage.setItem('userToken', data.token);
+                    console.log('Token saved, redirecting...');
+                    
+                    window.location.href = `${CONFIG.BASE_URL}/index.html`;
+                } else {
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = data.message || '登录失败，请检查账号密码';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = '登录失败，请检查网络连接';
+                errorMessage.style.display = 'block';
             }
-            
-            localStorage.setItem('userToken', data.token);
-            console.log('Token saved, redirecting...');
-            
-            // 使用完整路径进行跳转
-            const redirectUrl = `${CONFIG.BASE_URL}/index.html`;
-            console.log('Redirecting to:', redirectUrl);
-            window.location.href = redirectUrl;
-        } else {
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = data.message || '登录失败，请检查账号密码';
-            errorMessage.style.display = 'block';
-            console.error('Login failed:', data.message);
-        }
-    } catch (err) {
-        console.error('Login error:', err);
-        const errorMessage = document.getElementById('errorMessage');
-        errorMessage.textContent = '登录失败，请检查网络连接';
-        errorMessage.style.display = 'block';
+        });
     }
 });
 

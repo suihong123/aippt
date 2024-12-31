@@ -3,23 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <title>登录 - AIPPT生成器</title>
-    <link rel="stylesheet" href="./static/css/auth.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-157deg, #f57bb0, #867dea);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        
+        .auth-container {
+            background: white;
+            max-width: 400px;
+            width: 90%;
+            margin: 20px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #867dea;
+            outline: none;
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: rgba(255,68,68,0.1);
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #867dea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #7367d5;
+        }
+
+        .auth-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .auth-links a {
+            color: #867dea;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .auth-links a:hover {
+            color: #7367d5;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="auth-container">
         <h1>登录</h1>
-        <div id="errorMessage" class="error-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message"></div>
         <form id="loginForm">
             <div class="form-group">
-                <input type="text" name="phone" placeholder="手机号" required>
+                <input type="text" name="phone" placeholder="手机号" required pattern="[0-9]{11}">
             </div>
             <div class="form-group">
-                <input type="password" name="password" placeholder="密码" required>
+                <input type="password" name="password" placeholder="密码" required minlength="6">
             </div>
             <button type="submit">登录</button>
         </form>
         <div class="auth-links">
-            <a href="./register.html">注册账号</a>
+            <a href="./register.html">注册新账号</a>
         </div>
     </div>
     <script src="./static/js/config.js"></script>
