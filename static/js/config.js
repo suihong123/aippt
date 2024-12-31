@@ -1,6 +1,7 @@
 // 全局配置
 const CONFIG = {
     API_BASE_URL: 'https://api.docmee.cn',
+    BASE_URL: '/aippt',
     ENDPOINTS: {
         LOGIN: '/api/login',
         REGISTER: '/api/register',
