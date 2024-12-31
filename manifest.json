@@ -7,7 +7,7 @@
   "background_color": "#867dea",
   "theme_color": "#867dea",
   "orientation": "any",
-  "scope": "/",
+  "scope": "/aippt/",
   "icons": [
     {
       "src": "icon.png",

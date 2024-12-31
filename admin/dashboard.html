@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理后台 - AIPPT生成器</title>
+    <link rel="stylesheet" href="../static/css/admin.css">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-nav">
+            <a href="#codes">激活码管理</a>
+            <a href="#users">用户管理</a>
+            <a href="#stats">使用统计</a>
+        </nav>
+        
+        <div class="admin-content">
+            <!-- 激活码管理 -->
+            <section id="codes">
+                <h2>激活码管理</h2>
+                <div class="action-bar">
+                    <button onclick="generateCodes()">生成激活码</button>
+                    <input type="number" id="codeCount" placeholder="生成数量">
+                    <input type="number" id="codeDays" placeholder="有效天数">
+                </div>
+                <table id="codesTable">
+                    <thead>
+                        <tr>
+                            <th>激活码</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>使用时间</th>
+                            <th>剩余次数</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+            
+            <!-- 用户管理 -->
+            <section id="users">
+                <h2>用户管理</h2>
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>用户ID</th>
+                            <th>手机号</th>
+                            <th>注册时间</th>
+                            <th>最后登录</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+    <script src="../static/js/admin.js"></script>
+</body>
+</html> 

@@ -124,26 +124,43 @@
     // 检查登录状态
     async function checkAuth() {
         try {
-            const response = await fetch('/api/user/status');
+            const token = localStorage.getItem('userToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 验证token和使用权限
+            const response = await fetch('https://api.docmee.cn/api/user/status', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const data = await response.json();
+            
             if (!data.success) {
-                window.location.href = '/login';
+                window.location.href = 'login.html';
                 return;
             }
             
             // 检查使用次数和到期时间
             if (data.data.remaining_uses <= 0) {
-                alert('使用次数已用完，请激活新的激活码');
+                alert('使用次数已用完，请联系管理员购买新的激活码');
+                window.location.href = 'activate.html';
                 return;
             }
             
             if (new Date(data.data.expire_time) < new Date()) {
-                alert('账号已过期，请激活新的激活码');
+                alert('账号已过期，请联系管理员购买新的激活码');
+                window.location.href = 'activate.html';
                 return;
             }
+
+            // 使用用户的token初始化SDK
+            CONFIG.TOKEN = token;
         } catch (err) {
             console.error('验证失败:', err);
-            window.location.href = '/login';
+            window.location.href = 'login.html';
         }
     }
 

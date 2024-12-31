@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>激活码 - AIPPT生成器</title>
+    <link rel="stylesheet" href="static/css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h1>激活码</h1>
+        <form id="activateForm">
+            <div class="form-group">
+                <input type="text" name="code" placeholder="请输入激活码" required>
+            </div>
+            <button type="submit">激活</button>
+        </form>
+        <div class="user-info">
+            <p>剩余次数：<span id="remainingUses">-</span></p>
+            <p>到期时间：<span id="expireTime">-</span></p>
+        </div>
+    </div>
+    <script src="static/js/activate.js"></script>
+</body>
+</html> 
