@@ -32,12 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
+            const errorMessage = document.getElementById('errorMessage');
             
+            // 验证手机号
+            const phone = formData.get('phone');
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                errorMessage.textContent = '请输入正确的手机号';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
             try {
-                console.log('Login attempt:', {
-                    phone: formData.get('phone'),
-                    url: `${CONFIG.API_BASE_URL}/api/login`
-                });
+                console.log('Login attempt:', { phone });
 
                 const response = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
                     method: 'POST',
@@ -45,33 +51,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        phone: formData.get('phone'),
+                        phone: phone,
                         password: formData.get('password')
                     })
                 });
                 
-                console.log('Raw response:', response);
                 const data = await response.json();
-                console.log('Login response data:', data);
+                console.log('Login response:', data);
                 
-                if (data.success) {
-                    if (!data.token) {
-                        throw new Error('No token received');
-                    }
-                    
+                if (data.success && data.token) {
+                    // 保存token
                     localStorage.setItem('userToken', data.token);
-                    console.log('Token saved, redirecting...');
+                    localStorage.setItem('userPhone', phone);
                     
-                    window.location.href = `${CONFIG.BASE_URL}/index.html`;
+                    // 登录成功提示
+                    errorMessage.style.color = '#52c41a';
+                    errorMessage.textContent = '登录成功！正在跳转...';
+                    errorMessage.style.display = 'block';
+                    
+                    // 延迟跳转
+                    setTimeout(() => {
+                        window.location.href = `${CONFIG.BASE_URL}/index.html`;
+                    }, 1000);
                 } else {
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = data.message || '登录失败，请检查账号密码';
+                    errorMessage.style.color = '#ff4444';
+                    errorMessage.textContent = data.message || CONFIG.ERROR_MESSAGES.LOGIN_FAILED;
                     errorMessage.style.display = 'block';
                 }
             } catch (err) {
                 console.error('Login error:', err);
-                const errorMessage = document.getElementById('errorMessage');
-                errorMessage.textContent = '登录失败，请检查网络连接';
+                errorMessage.style.color = '#ff4444';
+                errorMessage.textContent = CONFIG.ERROR_MESSAGES.NETWORK_ERROR;
                 errorMessage.style.display = 'block';
             }
         });
@@ -85,18 +95,31 @@ document.addEventListener('DOMContentLoaded', () => {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
+            const errorMessage = document.getElementById('errorMessage');
             
-            // 验证密码
-            if (formData.get('password') !== formData.get('confirm_password')) {
-                const errorMessage = document.getElementById('errorMessage');
+            // 验证手机号
+            const phone = formData.get('phone');
+            if (!/^1[3-9]\d{9}$/.test(phone)) {
+                errorMessage.textContent = '请输入正确的手机号';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // 验证密码强度
+            const password = formData.get('password');
+            if (password.length < 6) {
+                errorMessage.textContent = '密码长度至少6位';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // 验证两次密码
+            if (password !== formData.get('confirm_password')) {
                 errorMessage.textContent = '两次输入的密码不一致';
                 errorMessage.style.display = 'block';
                 return;
             }
 
-            const phone = formData.get('phone');
-            const password = formData.get('password');
-            
             try {
                 console.log('Attempting registration...', { phone });
                 
@@ -112,25 +135,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 console.log('Register response:', data);
                 
                 if (data.success) {
-                    // 注册成功
-                    alert('注册成功！');
-                    window.location.href = `${CONFIG.BASE_URL}/login.html`;
+                    // 注册成功，显示提示并延迟跳转
+                    errorMessage.style.color = '#52c41a';
+                    errorMessage.textContent = '注册成功！正在跳转到登录页面...';
+                    errorMessage.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = `${CONFIG.BASE_URL}/login.html`;
+                    }, 2000);
                 } else {
-                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.style.color = '#ff4444';
                     errorMessage.textContent = data.message || CONFIG.ERROR_MESSAGES.REGISTER_FAILED;
                     errorMessage.style.display = 'block';
                 }
             } catch (err) {
                 console.error('Registration error:', err);
-                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.style.color = '#ff4444';
                 errorMessage.textContent = CONFIG.ERROR_MESSAGES.NETWORK_ERROR;
                 errorMessage.style.display = 'block';
             }
