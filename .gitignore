@@ -18,3 +18,8 @@ build/
 # System
 .DS_Store
 Thumbs.db 
+
+# 忽略不需要的文件
+static/js/theme/
+static/js/css/modules/
+static/js/layui.all.js 
