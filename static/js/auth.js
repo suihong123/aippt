@@ -104,13 +104,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const registerResponse = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        phone,
-                        password
+                        phone: phone,
+                        password: password,
+                        confirm_password: formData.get('confirm_password')
                     })
                 });
+                
+                if (!registerResponse.ok) {
+                    throw new Error(`HTTP error! status: ${registerResponse.status}`);
+                }
                 
                 const registerData = await registerResponse.json();
                 console.log('Register response:', registerData);
@@ -122,13 +128,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const loginResponse = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            phone,
-                            password
+                            phone: phone,
+                            password: password
                         })
                     });
+                    
+                    if (!loginResponse.ok) {
+                        throw new Error(`HTTP error! status: ${loginResponse.status}`);
+                    }
                     
                     const loginData = await loginResponse.json();
                     console.log('Auto-login response:', loginData);
