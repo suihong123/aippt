@@ -94,8 +94,13 @@ if (document.getElementById('registerForm')) {
             errorMessage.style.display = 'block';
             return;
         }
+
+        const phone = formData.get('phone');
+        const password = formData.get('password');
         
         try {
+            console.log('Attempting registration...', { phone });
+            
             // 注册请求
             const registerResponse = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
                 method: 'POST',
@@ -103,48 +108,59 @@ if (document.getElementById('registerForm')) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    phone: formData.get('phone'),
-                    password: formData.get('password')
+                    phone,
+                    password
                 })
             });
             
             const registerData = await registerResponse.json();
-            console.log('Register response:', registerData); // 调试日志
+            console.log('Register response:', registerData);
             
             if (registerData.success) {
-                // 注册成功后自动登录
+                // 注册成功后立即登录
+                console.log('Registration successful, attempting auto-login...');
+                
                 const loginResponse = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        phone: formData.get('phone'),
-                        password: formData.get('password')
+                        phone,
+                        password
                     })
                 });
                 
                 const loginData = await loginResponse.json();
-                console.log('Auto login response:', loginData); // 调试日志
+                console.log('Auto-login response:', loginData);
                 
                 if (loginData.success) {
+                    // 保存登录信息
                     localStorage.setItem('userToken', loginData.token);
+                    localStorage.setItem('userPhone', phone);  // 保存手机号
+                    console.log('Auto-login successful, redirecting...');
+                    
+                    // 跳转到主页
                     window.location.href = `${CONFIG.BASE_URL}/index.html`;
                 } else {
+                    console.error('Auto-login failed:', loginData.message);
                     const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.textContent = '自动登录失败：' + (loginData.message || '请手动登录');
+                    errorMessage.textContent = '注册成功但自动登录失败，请手动登录';
                     errorMessage.style.display = 'block';
+                    
+                    // 延迟2秒后跳转到登录页
                     setTimeout(() => {
                         window.location.href = `${CONFIG.BASE_URL}/login.html`;
                     }, 2000);
                 }
             } else {
+                console.error('Registration failed:', registerData.message);
                 const errorMessage = document.getElementById('errorMessage');
                 errorMessage.textContent = registerData.message || '注册失败，请重试';
                 errorMessage.style.display = 'block';
             }
         } catch (err) {
-            console.error('注册失败:', err);
+            console.error('Registration error:', err);
             const errorMessage = document.getElementById('errorMessage');
             errorMessage.textContent = '注册失败，请检查网络连接';
             errorMessage.style.display = 'block';
