@@ -11,45 +11,44 @@
 - PWA支持
 - 响应式设计
 
-## 在线使用
+## 快速开始
 
-访问 [https://suihong123.github.io/aippt/](https://suihong123.github.io/aippt/)
-
-## 本地开发
-
-1. 克隆仓库
-```bash
-git clone https://github.com/suihong123/aippt.git
-cd aippt
-```
-
-2. 安装依赖
+1. 安装依赖
 ```bash
 npm install
 ```
 
-3. 启动开发服务器
+2. 开发模式
 ```bash
 npm run dev
 ```
 
-## 部署
+3. 构建部署
+```bash
+npm run build
+npm run deploy
+```
 
-项目使用 GitHub Pages 部署，推送到 main 分支后会自动部署。
+## 项目结构
 
-## 使用说明
-
-1. 注册账号
-2. 联系管理员购买激活码
-3. 输入激活码获取使用权限
-4. 开始使用系统
+```
+aippt/
+├── index.html          # 主页面
+├── login.html          # 登录页面
+├── register.html       # 注册页面
+├── activate.html       # 激活码页面
+├── static/            # 静态资源
+│   ├── css/          # 样式文件
+│   └── js/           # JavaScript文件
+└── wenduoduo/        # SDK文件
+```
 
 ## 技术栈
 
-- 前端：HTML5, CSS3, JavaScript
-- PWA支持
-- GitHub Pages托管
-- API集成
+- Vite
+- JavaScript
+- HTML5/CSS3
+- PWA
 
 ## 许可证
 

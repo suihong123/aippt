@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>页面未找到 - AIPPT生成器</title>
+    <link rel="stylesheet" href="./static/css/error.css">
+    <script>
+        // 重定向处理
+        var segmentCount = 1;
+        var location = window.location;
+        var rootPath = '/aippt/';
+        var redirect = rootPath + location.pathname.split('/').slice(segmentCount).join('/');
+        if (location.pathname.indexOf(rootPath) === -1) {
+            window.location.href = redirect;
+        }
+    </script>
+</head>
+<body>
+    <div class="error-container">
+        <h1>404</h1>
+        <p>页面未找到</p>
+        <a href="/aippt/" class="back-link">返回首页</a>
+    </div>
+</body>
+</html> 
