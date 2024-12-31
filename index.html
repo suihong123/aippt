@@ -13,7 +13,7 @@
     <!-- 预加载SDK -->
     <link rel="preload" href="./wenduoduo/docmee-ui-sdk-iframe.min.js" as="script">
     <script src="./wenduoduo/docmee-ui-sdk-iframe.min.js"></script>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://docmee.cn; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://docmee.cn; img-src 'self' https://docmee.cn data:; connect-src 'self' https://docmee.cn; frame-src 'self' https://docmee.cn; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <style>
@@ -42,6 +42,11 @@
         background: linear-gradient(-157deg, #f57bb0, #867dea);
         background-size: 200% 200%;
         animation: gradient 15s ease infinite;
+        transition: all 0.3s ease;
+        opacity: 0;
+      }
+      #container.loaded {
+        opacity: 1;
       }
       @media (max-width: 768px) {
         #container {
@@ -50,28 +55,77 @@
           border-radius: 0;
         }
       }
+      .loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+      }
     </style>
+    <!-- 添加资源提示 -->
+    <link rel="dns-prefetch" href="https://docmee.cn">
+    <link rel="preconnect" href="https://docmee.cn">
+    <!-- 添加PWA支持 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#867dea">
   </head>
   <body>
     <div id="container"></div>
   </body>
   <script>
+    // 使用常量管理配置
+    const CONFIG = {
+      TOKEN: 'ak_u_loy5FsT35FvozDKZ',
+      LANG: 'zh',
+      MODE: 'light',
+      ERROR_MESSAGES: {
+        88: "使用次数已用完，请稍后再试",
+        default: "操作失败，请刷新页面重试"
+      }
+    };
+
+    // 定义回调处理函数
+    const handleCallback = {
+      onError: (error) => {
+        console.error('发生错误:', error);
+        // 添加错误上报
+        if (typeof error === 'object') {
+          const { message, stack } = error;
+          console.log('错误详情:', { message, stack });
+        }
+      },
+      onSuccess: (data) => {
+        console.log('操作成功:', data);
+        // 添加成功率统计
+        if (data.type === 'afterGenerate') {
+          console.log('生成成功:', data);
+        }
+      }
+    };
+
     // 初始化 UI iframe
     const docmeeUI = new DocmeeUI({
-      token: 'ak_u_loy5FsT35FvozDKZ',
+      token: CONFIG.TOKEN,
       container: document.querySelector("#container"),
       page: "creator",
-      lang: "zh",
-      mode: "light",
+      lang: CONFIG.LANG,
+      mode: CONFIG.MODE,
       onMessage(message) {
-        if (message.type === "invalid-token") {
-          console.error("Token验证失败，请检查配置");
-        } else if (message.type === "error") {
-          const errorMap = {
-            88: "使用次数已用完，请稍后再试",
-            default: "操作失败，请刷新页面重试"
-          };
-          console.error(errorMap[message.data.code] || errorMap.default);
+        try {
+          if (message.type === "invalid-token") {
+            handleCallback.onError("Token验证失败，请检查配置");
+          } else if (message.type === "error") {
+            const errorMap = {
+              88: "使用次数已用完，请稍后再试",
+              default: "操作失败，请刷新页面重试"
+            };
+            handleCallback.onError(errorMap[message.data.code] || errorMap.default);
+          } else {
+            handleCallback.onSuccess(message);
+          }
+        } catch (err) {
+          handleCallback.onError(err);
         }
       },
     });
