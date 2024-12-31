@@ -2,6 +2,8 @@
 const CONFIG = {
     API_BASE_URL: 'https://api.docmee.cn',
     BASE_URL: '/aippt',
+    ASSETS_URL: './static',
+    SDK_URL: './wenduoduo',
     ENDPOINTS: {
         LOGIN: '/api/login',
         REGISTER: '/api/register',

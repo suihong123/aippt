@@ -1,27 +1,27 @@
 const CACHE_NAME = 'aippt-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/static/css/main.css',
-  '/static/css/login.css',
-  '/static/js/main.js',
-  '/static/js/auth.js',
-  '/wenduoduo/docmee-ui-sdk-iframe.min.js',
-  '/manifest.json',
-  '/icon.png',
-  '/icon-512.png',
-  '/favicon.ico'
+const ASSETS = [
+    './',
+    './index.html',
+    './login.html',
+    './register.html',
+    './activate.html',
+    './static/css/main.css',
+    './static/css/auth.css',
+    './static/js/main.js',
+    './static/js/auth.js',
+    './static/js/api.js',
+    './static/js/utils.js',
+    './static/js/security.js',
+    './favicon.ico',
+    './icon.png'
 ];
 
-// 安装Service Worker
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(ASSETS_TO_CACHE);
-      })
-  );
+// 安装 Service Worker
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(ASSETS))
+    );
 });
 
 // 激活Service Worker
