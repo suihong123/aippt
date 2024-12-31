@@ -37,5 +37,19 @@ const utils = {
         } else {
             alert(CONFIG.ERROR_MESSAGES.NETWORK_ERROR);
         }
+    },
+    
+    // 处理API错误
+    handleApiError(error, defaultMessage = '操作失败') {
+        console.error('API Error:', error);
+        if (error.response) {
+            return error.response.message || CONFIG.ERROR_MESSAGES.default;
+        }
+        return defaultMessage;
+    },
+    
+    // 显示错误消息
+    showError(message) {
+        alert(message);
     }
 }; 

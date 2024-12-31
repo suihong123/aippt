@@ -61,4 +61,17 @@ button:hover {
 .user-info p {
     margin: 5px 0;
     color: #666;
+}
+
+.error-message {
+    background-color: #fee;
+    color: #c00;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.error-message.show {
+    display: block !important;
 } 

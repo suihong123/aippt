@@ -31,7 +31,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const formData = new FormData(e.target);
     
     try {
-        const response = await fetch('https://api.docmee.cn/api/login', {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -47,11 +47,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             localStorage.setItem('userToken', data.token);
             window.location.href = 'index.html';
         } else {
-            alert(data.message);
+            // 显示具体的错误信息
+            alert(data.message || '登录失败，请检查账号密码');
         }
     } catch (err) {
         console.error('登录失败:', err);
-        alert('登录失败，请重试');
+        alert('登录失败，请检查网络连接');
     }
 });
 
