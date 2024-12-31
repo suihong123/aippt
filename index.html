@@ -1,182 +1,134 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="author" content="AIPPT">
-    <meta name="robots" content="noindex,follow">
-    <meta property="og:title" content="AIPPT 生成器 - AI智能PPT生成工具">
-    <meta property="og:description" content="AI驱动的PPT生成工具，只需输入主题即可生成专业PPT">
-    <meta property="og:image" content="https://suihong123.github.io/aippt/icon.png">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <title>AIPPT 生成器 - AI智能PPT生成工具</title>
-    <!-- 添加PWA支持 -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkFJUFBU55Sf5oiQ5ZmoIiwKICAic2hvcnRfbmFtZSI6ICJBSVBQVCIsCiAgImRlc2NyaXB0aW9uIjogIkFJ6amx5Yqo55qEUFBU55Sf5oiQ5bel5YW3IiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAic2NvcGUiOiAiL2FpcHB0LyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM4NjdkZWEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICIuL2ljb24ucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9IA==">
-    <meta name="theme-color" content="#867dea">
-    <link rel="apple-touch-icon" href="icon.png">
-    <!-- 预加载SDK -->
-    <link rel="preload" href="https://docmee.cn/sdk/docmee-ui-sdk-iframe.min.js" as="script">
-    <script src="https://docmee.cn/sdk/docmee-ui-sdk-iframe.min.js"></script>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://api.docmee.cn https://docmee.cn; img-src 'self' https://docmee.cn data:; connect-src 'self' https://api.docmee.cn https://docmee.cn; frame-src 'self' https://docmee.cn; script-src 'self' 'unsafe-inline' https://docmee.cn; style-src 'self' 'unsafe-inline';">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <!-- 添加Service Worker -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-              console.log('SW registered:', registration);
-            })
-            .catch(error => {
-              console.log('SW registration failed:', error);
-            });
-        });
-      }
-    </script>
+<head>
+    <meta charset="UTF-8">
+    <title>AIPPT生成器</title>
     <style>
-      body {
-        width: 100vw;
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-      }
-      @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-      }
-      #container {
-        width: calc(100% - 20px);
-        height: calc(100% - 20px);
-        margin: 0;
-        padding: 0;
-        border-radius: 12px;
-        box-shadow: 0 0 12px rgba(120, 120, 120, 0.3);
-        overflow: hidden;
-        background: linear-gradient(-157deg, #f57bb0, #867dea);
-        background-size: 200% 200%;
-        animation: gradient 15s ease infinite;
-        transition: all 0.3s ease;
-        opacity: 0;
-      }
-      #container.loaded {
-        opacity: 1;
-      }
-      @media (max-width: 768px) {
-        #container {
-          width: 100%;
-          height: 100%;
-          border-radius: 0;
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-157deg, #f57bb0, #867dea);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
         }
-      }
-      .loading {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: none;
-      }
-      .login-tip {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-      }
-      .login-tip button {
-        background: #867dea;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 10px;
-      }
-      .login-tip button:hover {
-        background: #7367d5;
-      }
+        
+        .container {
+            background: white;
+            max-width: 800px;
+            width: 90%;
+            margin: 20px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .input-area {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #867dea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #7367d5;
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin: 10px 0;
+            display: none;
+        }
     </style>
-    <!-- 添加资源提示 -->
-    <link rel="dns-prefetch" href="https://docmee.cn">
-    <link rel="preconnect" href="https://docmee.cn">
-    
-    <script async type="module" crossorigin src="/aippt/static/main-87ef4f3e.js"></script>
-    <link rel="stylesheet" href="/aippt/static/index-dcbe34f5.css">
-  </head>
-  <body>
-    <div id="container"></div>
-    <script src="./static/js/config.js"></script>
+  <script async type="module" crossorigin src="/aippt/static/main-28788956.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>AIPPT生成器</h1>
+        <div class="input-area">
+            <textarea id="prompt" placeholder="请输入您想要生成PPT的主题或内容描述..."></textarea>
+        </div>
+        <button onclick="generatePPT()">生成PPT</button>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="resultArea" class="result-area">
+            <h3>生成结果</h3>
+            <div id="result"></div>
+        </div>
+    </div>
+
     <script>
-        // 等待配置加载完成
-        window.addEventListener('load', async () => {
+        async function generatePPT() {
+            const prompt = document.getElementById('prompt').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const resultArea = document.getElementById('resultArea');
+            const result = document.getElementById('result');
+
+            if (!prompt) {
+                errorMessage.textContent = '请输入生成内容';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
             try {
-                // 获取token
-                const token = CONFIG.SDK.DEFAULT_TOKEN;
-                const isLoggedIn = localStorage.getItem('userToken');
+                errorMessage.style.display = 'none';
+                resultArea.style.display = 'none';
                 
-                // 初始化 UI iframe
-                const docmeeUI = new DocmeeUI({
-                    token: token,
-                    container: document.querySelector("#container"),
-                    page: "creator",
-                    lang: "zh",
-                    mode: "light",
-                    onMessage(message) {
-                        try {
-                            if (message.type === "invalid-token") {
-                                console.error("Token验证失败");
-                                docmeeUI.updateToken(CONFIG.SDK.DEFAULT_TOKEN);
-                            } else if (message.type === "error") {
-                                if (!isLoggedIn) {
-                                    if (confirm('请登录后使用完整功能，是否现在登录？')) {
-                                        window.location.href = '/aippt/login.html';
-                                    }
-                                } else {
-                                    console.error("SDK错误:", message);
-                                    alert(message.data.message || "操作失败，请重试");
-                                }
-                            } else if (message.type === "click" || message.type === "input") {
-                                if (!isLoggedIn) {
-                                    if (confirm('请登录后使用完整功能，是否现在登录？')) {
-                                        window.location.href = '/aippt/login.html';
-                                    }
-                                    return;
-                                }
-                            }
-                        } catch (err) {
-                            console.error("消息处理错误:", err);
-                        }
-                    }
+                // 这里添加生成PPT的API调用
+                const response = await fetch('https://api.docmee.cn/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
                 });
 
-                // 显示容器
-                document.querySelector("#container").classList.add('loaded');
+                const data = await response.json();
                 
-                if (!isLoggedIn) {
-                    const loginTip = document.createElement('div');
-                    loginTip.className = 'login-tip';
-                    loginTip.innerHTML = `
-                        <div class="tip-content">
-                            <p>请登录后使用完整功能</p>
-                            <button onclick="window.location.href='/aippt/login.html'">立即登录</button>
-                        </div>
+                if (data.success) {
+                    result.innerHTML = `
+                        <p>PPT生成成功！</p>
+                        <p><a href="${data.downloadUrl}" target="_blank">点击下载</a></p>
                     `;
-                    document.body.appendChild(loginTip);
+                    resultArea.style.display = 'block';
+                } else {
+                    throw new Error(data.message || '生成失败');
                 }
             } catch (err) {
-                console.error("初始化错误:", err);
-                alert("系统初始化失败，请刷新页面重试");
+                errorMessage.textContent = err.message || '生成失败，请重试';
+                errorMessage.style.display = 'block';
             }
-        });
+        }
     </script>
-    <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
-    <script nomodule crossorigin id="vite-legacy-entry" data-src="/aippt/static/main-legacy-b9cda9a4.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
-  </body>
+  <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+  <script nomodule crossorigin id="vite-legacy-entry" data-src="/aippt/static/main-legacy-518b8698.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+</body>
 </html>
