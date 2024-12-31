@@ -104,21 +104,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 const registerResponse = await fetch(`${CONFIG.API_BASE_URL}/api/register`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        ...CONFIG.API_HEADERS,
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
+                    credentials: 'include',  // 包含 cookies
                     body: JSON.stringify({
                         phone: phone,
-                        password: password,
-                        confirm_password: formData.get('confirm_password')
+                        password: password
                     })
                 });
                 
                 if (!registerResponse.ok) {
-                    throw new Error(`HTTP error! status: ${registerResponse.status}`);
+                    const errorText = await registerResponse.text();
+                    console.error('Registration failed:', registerResponse.status, errorText);
+                    throw new Error(`Registration failed: ${registerResponse.status}`);
                 }
                 
-                const registerData = await registerResponse.json();
+                let registerData;
+                try {
+                    registerData = await registerResponse.json();
+                } catch (jsonError) {
+                    console.error('JSON parse error:', jsonError);
+                    throw new Error('Invalid response format');
+                }
+                
                 console.log('Register response:', registerData);
                 
                 if (registerData.success) {
@@ -172,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 console.error('Registration error:', err);
                 const errorMessage = document.getElementById('errorMessage');
-                errorMessage.textContent = '注册失败，请检查网络连接';
+                errorMessage.textContent = err.message || '注册失败，请检查网络连接';
                 errorMessage.style.display = 'block';
             }
         });
